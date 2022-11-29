@@ -1,6 +1,6 @@
 import redis
 import json
-from flask import Flask, abort, request, redirect
+from flask import Flask, abort, request, redirect, Response
 import hashlib
 app = Flask(__name__)
 r = redis.Redis(host='localhost', port=6379, db=0)
@@ -19,7 +19,8 @@ def shorten():
 
         shortened = f'{digest}'[-8:-1]
         r.set(shortened, toShorten)
-        return json.dumps({'url': toShorten, 'hash': shortened, 'redirectUrl': f'http://127.0.0.1:5000/{shortened}'})
+        return Response(json.dumps({'url': toShorten, 'hash': shortened, 'redirectUrl': f'http://127.0.0.1:5000/{shortened}'}), status=200)
+    return Response(response='No URL passed to shorten', status=400)
 
 
 @app.route('/<hash>', methods=['GET'])
